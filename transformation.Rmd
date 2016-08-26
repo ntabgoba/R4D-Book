@@ -331,6 +331,51 @@ delays <- flights %>%
 #Behind the scenes, x %>% f(y) turns into f(x, y), and x %>% f(y) %>% g(z) turns into g(f(x, y), z) and so on.
 ```
 
+#### 4.7.2 Missing values
+All aggregation functions have an na.rm argument which removes the missing values prior to computation.
+```{r}
+flights %>%
+        group_by(year, month, day) %>%
+        summarise(mean = mean(dep_delay, na.rm = TRUE)) #if false you get lots of NA in mean
+#In this case, where missing values represent cancelled flights, we could also tackle the problem by first removing the cancelled flights:
+
+not_cancelled <- filter(flights, !is.na(dep_delay), !is.na(arr_delay))
+not_cancelled %>% 
+        group_by(year, month, day) %>% 
+        summarise(mean = mean(dep_delay))
+```
+
+##### 4.7.3 Counts
+- To ever avoid making conclusions based on very small amounts of non-missing data. Its always a good idea to count `n()`, or count non missing values `sum(!is.na(x))`.
+```{r}
+# Lets look at planes(identified by their tail no.) that have highest average delays
+delays <- not_cancelled %>%
+        group_by(tailnum) %>%
+        summarise(
+                delay = mean(arr_delay), n()
+        )
+ggplot(delays, aes(delay)) +
+        geom_histogram(binwidth = 10)
+# Wow, there are some planes that hve an average delay of 5 hours.
+# Its a nuanced story, we get more insight if we draw a scatterplot of no. of flights vs av delay.
+
+delays <- not_cancelled %>%
+        group_by(tailnum) %>%
+        summarise(
+                delay = mean(arr_delay, na.rm = TRUE),
+                n = n()
+        )
+ggplot(delays, aes(n, delay)) +
+        geom_point()
+#The shape of this plot is very characteristic: whenever you plot a mean (or many other summaries) vs number of observations, you’ll see that the variation decreases as the sample size increases.
+```
+Lets filter out the groups with the smallest number of observations. And also try using ggplot into dplyr. Though u have to switch btn %>% to +, it stil gets convinient.
+```{r}
+delays %>%
+        filter(n > 25) %>%
+        ggplot(aes(n, delay)) +
+               geom_point()
+```
 
 
 
