@@ -1,0 +1,237 @@
+---
+title: "Transformation"
+author: "Jovani Ntabgoba"
+date: "May 1, 2016"
+output: html_document
+---
+> Create new variables, summaries, rename variables or reorder observations
+*Examples are NYC departure flights 2013*, [source](www.transtats.bts.gov/DatabaseInfo.asp?DB_ID=120&Link=0)
+
+### 4.1 nycflights14
+```{r message=FALSE}
+library(ggplot2)
+library(nycflights13)
+library(dplyr)
+flights
+```
+`View(flights)`,shows you the entire dataset like excel in viewer.
+```{r}
+class(flights)
+```
+- It prints diff coz it has diff class from usual dataframes.
+- tbl\_df *tibble diff* or data\_frame
+- `as.data_frame()` converts to tbl_df
+- To create new tbl\_df from individual vectors,use data\_frame() eg
+`data_frame(x=1:3, y=c("a", "b", "c"))`
+- Subseting tbl\_df with [ always returns a tbl\_df, contrary to other that may give a vector.
+- To extract a single column, use [[ or $.
+
+### 4.2 dplyr verbs
+- 5 dplyr functions i.e *arrange,filter, select, mutate and summarise*.
+- All can be used in conjuction with `group_by()`.
+- First arg is data frame, 2nd arg what to do with data, 3rd is a new data frame.
+
+#### Filter rows with `filter()`.
+- Used to subset observations.
+- Example
+```{r}
+filter(flights, month == 1, day == 1)
+```
+- returns a new data frame, which you can save as usual
+- to print and save, engulf it in ()
+
+#### 4.3.1 Comparisons
+Beware of using  == on floating numbers, eg math $sqrt(2)^2 == 2$ or $1/49 * 49 = 1$, by using $< 1e-6$ instead to check that you are close.
+
+#### 4.3.2 Logical Operators
+```r
+filter(flights, month == 11 | month == 12) 
+# is like  
+filter(flights, month == 1)
+```
+- Use filter(flights, month %in% c(11,12))
+- Complete set of boolean ![operations](boolean.png)
+- De Morgan’s law: \!\(x & y\) is the same as \!x | \!y, and \!\(x | y\) is the same as \!x & \!y
+- Example, to get flights that weren't delayed by more than two hours
+```r
+filter(flights, !(arr_delay > 120 | dep_delay > 120))
+# or
+filter(flights, arr_delay <= 120, dep_delay <= 120)
+```
+- R has both & and |,are vectorised. && and || are scalar operators.
+- To find all rows after the first TRUE or all rows until FALSE.Use these cumulative functions;
+
+```r
+df <- data_frame(
+        x = c(FALSE, TRUE, FALSE),
+        y = c(TRUE, FALSE, TRUE)
+)
+filter(df, cumany(x)) # all rows after first TRUE
+filter(df, cumall(y)) # all rows until first FALSE
+```
+
+#### 4.3.3 Missing values
+- `filter()` only includes rows where condition is TRUE, it excludes both FALSE and NA values. If you want to preserve missing values,ask for them explicitly.
+```{r}
+df <- data_frame(x =c(1, NA, 3))
+filter(df, x >1)
+filter(df, is.na(x) | x > 1)
+```
+
+### 4.3.4 Exercises
+- Find flights;
+        * departed in summer
+```{r}
+summer <- filter(flights, month %in% c(6,7,8))
+dim(summer) # 86995 Flights (Observations)
+```
+        * That flew to Houston \(IAH or HOU\)
+```{r}
+houston <- filter(flights, dest %in% c("IAH","HOU"))
+dim(houston) # 9313 Observations
+```
+        * There were operated by United, America or Delta
+```{r}
+usade <- filter(flights, carrier %in% c("US","AA","DL"))
+dim(usade) # 101,375 flights
+```
+        * That were delayed by more than two hours
+```{r}
+delay2hr <- filter(flights, dep_delay >= 120 | arr_delay >=120)
+dim(delay2hr) # 11,606 Flights
+```
+        * Arrived more than 2hours late, but didnt leave late.
+```{r}
+de2le0 <- filter(flights, arr_delay >= 120 & dep_delay <= 0)
+dim(de2le0) # 29 flights
+```
+        * Were delayed by at least an hour, but made up over 30 minutes in flight
+```{r}
+flig30 <- filter(flights,air_time >= 30)
+flig1h30 <- filter(flig30, dep_delay >= 60 | arr_delay >= 60)
+
+dim(flig1h30) # 31,932 flights delayed atleast an hour,but made over 30min flight
+```
+        * Departed between midnight and 6am
+```{r}
+mid6am <- filter(flights, hour >= 0 & hour <= 6)
+dim(mid6am) # 27,905 flights left between 0 and 6am
+```
+        * Flights have a missing dep_time? What other variables are missing? What might these rows represent?
+```{r}
+mis_dept <- filter(flights, is.na(dep_time))
+dim(mis_dept) # 8255 flights have NA as dep_time
+```
+- View\(mis\_dept\), dep\_delay,arr\_time, arr\_delay and air\_time are missing
+- These could be canceled flights
+
+### 4.4 Arrange rows with arrange()
+- Works similarly to filter\(\), but instead of filtering/selecting,reorders them.
+```{r}
+arrange(flights, year, month, day)
+arrange(flights, desc(arr_delay))
+```
+- Missing values always come at the end.
+- baseR same `flights[order(flights$year, flights$month, flights$day), , drop = FALSE]`
+
+Exercises
+        * How could you use arrange\(\) to sort all missing values to the start?
+```{r}
+nas <- arrange(flights, desc(is.na(arr_delay))) #arr_delay begins with NAs
+dim(nas)
+```
+        * Sort flights to find the most delayed flights. Find the flights that left earliest.
+```{r}
+nas <- arrange(flights, desc(dep_delay + arr_delay)) 
+sumbo <- flights$dep_delay + flights$arr_delay
+nas_new <- sort(sumbo)
+tail(nas_new) # Most delayed flight took 2573Minutes arr&dep (42.8hours,is it possible!!!)
+head(nas_new,30) # Earliest was 100min ahead of schedule(both dep&arr)
+# Did use arrange, though.
+```
+
+#### 4.5 select()
+- Its not uncommon to get datasets with thousands of variables and face trouble of narrowing in on variables that you actually want.
+- select\(\) arrows you to zoom in rapidly on a useful subset using operations based on names of the variables.
+
+```r
+select(flights, year, month, day) # Select col by name
+select(flights, year:day) # select all col btwn year and day(inclusive)
+selct(flights, -(year:day)) # select all col except from year to day(inclusive)
+```
+*Helper functions u can use with select()*
+- starts\_with \("abc"\) , ends\_with \("xyz"\) , contains\("ijk"\), 
+- matches\("(.\)\\"\) selects variables that match a regular expression. This one matches any variables that contain repeated characters.
+- num\_range \("x", 1:3\) matches x1, x2 and x3.
+- Its also possible to use select\(\) to rename variables.
+`select(flights, tail_num = tailnum)`
+- But coz select drops all other variables not explicitly mentioned, its not useful. Instead rename\(\), keeps variables by default.
+`rename(flights, tail_num = tailnum)`
+- select\(\) function works similar to the select arg of base::subset().But dply select is a function on its own, which keeps functions small as dplyr philosophy.
+
+##### Exercise
+Brainstorm as many ways as possible to select dep_time, dep_delay, arr_time, and arr_delay from flights.
+```{r}
+option1 <- select(flights, dep_time, dep_delay, arr_time, arr_delay)
+```
+
+#### 4.6 Add new variables with mutate()
+- Its also often useful to add columns that are functions of existing columns.
+- Mutate always adds new columns at the end of your dataset.
+```{r}
+flights_sml <- select(flights,
+        year:day,
+        ends_with("delay"),
+        distance,
+        air_time
+)
+
+mutate(flights_sml,
+       gain = arr_delay - dep_delay,
+       speed = distance / air_time * 60
+)
+```
+- you can refer to columns in mutate that you just created up;
+```r
+mutate(flights_sml,
+        gain = arr_delay - dep_delay,
+        hours = air_time / 60,
+        gain_per_hour = gain / hours
+)
+```
+- If you only want to keep the new variables, use transmute\(\)
+```r
+transmute(flights,
+        gain = arr_delay - dep_delay,
+        hours = air_time / 60,
+        gain_per_hour = gain / hours
+)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
