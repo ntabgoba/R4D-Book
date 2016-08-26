@@ -459,6 +459,55 @@ not_cancelled %>%
 ```
 
 
+###### 4.7.5 Grouping by multiple variables
+
+When you group by multiple variables, each summary peels off one level of the grouping. That makes it easy to progressively roll-up a dataset:
+```{r}
+daily <- group_by(flights, year, month, day)
+(per_day   <- summarise(daily, flights = n()))
+
+(per_month <- summarise(per_day, flights = sum(flights)))
+
+(per_year  <- summarise(per_month, flights = sum(flights)))
+```
+
+###### 4.7.6 Ungrouping
+If you need to remove grouping, and return to operations on ungrouped data, use `ungroup()`.
+```{r}
+daily %>% 
+  ungroup() %>%             # no longer grouped by date
+  summarise(flights = n())  # all flights
+```
+
+###### Exercises
+
+1. Refer back to the table of useful mutate and filtering functions. Describe how each operation changes when you combine it with grouping.
+
+# Average delay per each carrier's total flights that delayed for 15min
+dep_arrde15 <- filter(flights, dep_delay == -15 | dep_delay == 15 | arr_delay == -15 | arr_delay == 15)
+View(dep_arrde15)
+by_co <- group_by(dep_arrde15, carrier)
+per_co <- summarise(by_co,
+        count = n(),
+        dep_mean = mean(dep_delay, na.rm = TRUE),
+        arr_mean = mean(dep_delay, na.rm = TRUE)
+)
+View(per_co)
+
+# Average delay per each carrier's total flights
+fli_carrier <- group_by(flights, carrier)
+fli_co <- summarise(fli_carrier,
+        count = n(),
+        dep_mean = mean(dep_delay, na.rm = TRUE),
+        arr_mean = mean(dep_delay, na.rm = TRUE)
+)
+View(fli_co)
+
+
+TBC
+
+
+END.
 
 
 
