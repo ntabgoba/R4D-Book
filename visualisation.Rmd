@@ -1,0 +1,49 @@
+---
+title: "Visualization"
+author: "Jovani Ntabgoba"
+date: "April 29th 2016"
+output: 
+  pdf_document: 
+    latex_engine: xelatex
+---
+pkgs <- c(
+        "broom", "dplyr", "ggplot2", "jpeg", "jsonlite", 
+        "knitr", "Lahman", "microbenchmark", "png", "pryr", "purrr", 
+        "rcorpora", "readr", "stringr", "tibble", "tidyr"
+)
+install.packages(pkgs)
+library(ggplot2)
+
+
+```{r cars}
+library(knitr)
+library(ggplot2)
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy))
+```
+ggplot(data = <DATA>) + <GEOM_FUNCTION>(mapping = aes(<MAPPINGS>))
+map the colors of your points to the class variable, to reveal class of each car
+```{r}
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy, color = class))
+```
+
+```{r}
+#or map the class to the size aesthetic
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy, size = class))
+```
+
+```{r}
+#or map the class to the alpha aesthetic (transparency of points).
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy, alpha = class))
+```
+
+```{r}
+#or map class to the shape of the points
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy, shape = class))
+```
+
+
+
+
+
+
+
