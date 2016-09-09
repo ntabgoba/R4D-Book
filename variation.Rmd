@@ -102,6 +102,33 @@ The simplest way to summarise covariance between two variables is with a model l
 
 Use 'geom_smooth()' to display a model line between any two variables.
 
+```{r}
+ggplot(data = diamonds) +
+  geom_point(mapping = aes(x = carat, y = price)) +
+  geom_smooth(mapping = aes(x = carat, y = price))
+
+# geom_smooth() will add a loess line to your data if the data contains less than 1000 points, otherwise it will fit a general additive model to your data with a cubic regression spline, and plot the resulting model line.
+# Use the method argument of geom_smooth() to add a specific type of model line to your data.
+# By default, geom_smooth() will use the formula y ~ x to model your data. You can modify this formula by setting the formula argument to a different formula.
+
+ggplot(data = diamonds) +
+  geom_point(mapping = aes(x = carat, y = price)) +
+  geom_smooth(mapping = aes(x = carat, y = price), 
+    method = lm, formula = y ~ poly(x, 4))
+#avoid being fooled by also inspecting the raw data or calculating the correlation between your variables, e.g. cor(diamonds$carat, diamonds$price)
+```
+        - `geom_quantile()`
+        - `geom_bin2d()` divides the coordinate plane into a two dimensional grid and then displays the number of observations that fall into each bin in the grid.
+        - `geom_hex()` works similarly to geom_bin2d(), but it divides the coordinate plane into hexagon shaped bins.
+
+###### 5.0.3.1.2 Visualize correlations between three variables
+
+There are two ways to add three (or more) variables to a two dimensional plot. You can map additional variables to aesthetics within the plot, or you can use a geom that is designed to visualize three variables.
+
+ggplot2 provides three geoms that are designed to display three variables: `geom_raster(),` `geom_tile() and geom_contour()`. These geoms generalize `geom_bin2d() and geom_density()` to display a third variable instead of a count, or a density.
+
+geom_raster() and geom_tile()
+
 
 
 
