@@ -152,4 +152,20 @@ Color aes does outline of bars, fill aes does fill bars
 ggplot(data = diamonds) +
         geom_bar(mapping = aes(x = cut, fill = cut))
 ```
+### 3.5.1 Position = "identity"
+position = "stack", places overappling objects on top of each other, = "fill"
+fills the entire bars, letting you easily compare.
+position = "dodge", places overlapping objects directly beside one another.
+```{r}
+ggplot(data = diamonds) +
+        geom_bar(mapping = aes(x = cut, fill = clarity), position = "dodge") +
+        ggtitle('Position ="dodge"')
+```
+position = "jitter", used for scatter plots, to see weight of points,incase some overlapped
+jitter adds a litle bit of noise on each point to make them diffrent if overlapped
+```{r}
+ggplot(data = mpg) +
+        geom_point(mapping = aes(x = displ, y = hwy), position = "jitter") +
+        ggtitle('Position = "jitter"')
+```
 
