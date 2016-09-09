@@ -1,0 +1,40 @@
+---
+title: "variation"
+author: "Jovani Ntabgoba"
+date: "May 3, 2016"
+output: html_document
+---
+To understand anything you must decipher patterns of variation.
+The best way to study variation is to collect data, particularly rectangular data: data that is made up of variables, observations, and values.
+        * A variable is a quantity, quality, or property that you can measure.
+        * A value is the state of a variable when you measure it. The value of a variable may change from measurement to measurement.
+        *An observation is a set of measurements you make under similar conditions (usually all at the same time or on the same object). Observations contain values that you measure on different variables.
+- A variable is continuous if you can arrange its values in order and an infinite number of values can exist between any two values of the variable.
+ggplot2 will treat your variable as continuous if it is a numeric, integer, or a recognizable date-time class (but not a factor
+- A variable is discrete if it is not continuous. Discrete variables can only contain a finite (or countably infinite) set of unique values.
+ggplot2 will treat your variable as discrete if it is not a numeric, integer, or recognizable date-time class.
+
+##### 5.0.1.0.1 Discrete distributions
+```{r}
+library(ggplot2)
+ggplot(data = diamonds) +
+        geom_bar(mapping = aes(x = cut,fill = cut))
+#You can compute counts of discrete variables using R's table() function.
+table(diamonds$cut)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
