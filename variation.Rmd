@@ -23,18 +23,33 @@ ggplot(data = diamonds) +
 table(diamonds$cut)
 ```
 
+##### 5.0.1.0.2 Continous distributions
+> If your data is truly continuous, then no two observations will have the same value—so long as you measure the data precisely enough (e.g. without rounding to the _n_th decimal place).
+> To get around this, data scientists divide the range of a continuous variable into equally spaced intervals, a process called binning.
+        * They then count how many observations fall into each bin.
+        * And display the count as a bar, or some other object.
+This method is temperamental because the appearance of the distribution can change dramatically if the bin size changes. As no bin size is “correct,” you should explore several bin sizes when examining data.
 
+Several geoms exist to help you visualize continuous distributions. They almost all use the “bin” stat to implement the above strategy. For each of these geoms, you can set the following arguments for “bin” to use:
 
+        * binwidth - the width to use for the bins in the same units as the x variable
+        * origin - origin of the first bin interval
+        * right - if TRUE bins will be right closed (e.g. points that fall on the border of two bins will be counted with the bin to the left)
+        * breaks - a vector of actual bin breaks to use. If you set the breaks argument, it will override the binwidth and origin arguments.
+Use geom_histogram() to make a traditional histogram. The height of each bar reveals how many observations fall within the width of the bar.
+```{r}
+ggplot(data = diamonds) +
+        geom_histogram(aes(x = carat))
+# Compare plots
+ggplot(data = diamonds) +
+        geom_histogram(aes(x = carat), binwidth = 1)
 
+ggplot(data = diamonds) +
+  geom_histogram(aes(x = carat), binwidth = 0.01)
 
+# geom_density: displays  densitydensity —not  countcount —on the y axis, which makes it easier to compare the shape of the distributions of multiple subgroups; the area under each curve will be normalized to one, no matter how many total observations occur in the subgroup
 
-
-
-
-
-
-
-
-
-
+ggplot(data = diamonds) +
+  geom_density(aes(x = carat, color = cut), kernel = "gaussian", adjust = 4)
+```
 
