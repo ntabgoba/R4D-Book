@@ -53,3 +53,65 @@ ggplot(data = diamonds) +
   geom_density(aes(x = carat, color = cut), kernel = "gaussian", adjust = 4)
 ```
 
+
+#### 5.0.2 Compare Distributions
+###### 5.0.3 Visualize covariation
+5.0.3.1 Visualise functions between two variables
+Covariation is a relationship between the values of two or more variables.
+However “correlation (covariation) does not prove causation”. 
+```{r}
+ggplot(data = economics) +
+  geom_point(aes(x = date, y = unemploy))
+
+#geom_line makes the relationship clear
+ggplot(data = economics) +
+  geom_line(aes(x = date, y = unemploy))
+
+#Use geom_step() to turn a line chart into a step function
+ggplot(data = economics[1:150, ]) +
+  geom_step(aes(x = date, y = unemploy))
+
+# geom_area() creates a line chart with a filled area under the line.
+ggplot(data = economics) +
+  geom_area(aes(x = date, y = unemploy))
+```
+
+###### 5.0.3.1.1 Visualize correlations between two variables
+
+Many variables do not have a functional relationship. As a result, a single value of one variable can correspond to multiple values of another variable.
+Height and weight are two variables that are often related, but do not have a functional relationship.
+The easiest way to plot the relationship between two variables is with a scatterplot, i.e. geom_point()
+```{r}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy))
+
+# jitter adjustment is so useful that ggplot2 provides the geom_jitter()
+ggplot(data = mpg) +
+  geom_jitter(mapping = aes(x = displ, y = hwy))
+
+# geom_rug() adds a tickmark along each axis for each value observed in the data. 
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy)) +
+  geom_rug(mapping = aes(x = displ, y = hwy), position = "jitter")
+```
+*Note*
+Data set only contains 53,940 points, but the points overplot each other in a way that we cannot fix with jittering.
+For large data, it is more useful to plot summary information that describes the raw data than it is to plot the raw data itself. Several geoms can help you do this.
+
+The simplest way to summarise covariance between two variables is with a model line. The model line displays the trend of the relationship between the variables.
+
+Use 'geom_smooth()' to display a model line between any two variables.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
