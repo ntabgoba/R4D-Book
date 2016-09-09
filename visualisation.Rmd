@@ -89,4 +89,32 @@ ggplot(data = mpg) +
 
 
 
+**Note**: ggplot2 provides 37 geom functions. Each suited for a particular type of data or relationship
 
+### 3.4 Layers
+To display multiple geoms in the same plot, Add multiple geom functions.
+```{r}
+ggplot(data = mpg) + 
+        geom_point(mapping = aes(x = displ, y = hwy)) +
+        geom_smooth(mapping= aes(x = displ, y = hwy))
+```
+to avoid redundancy of code, put the arg in ggplot() to make them global
+```{r}
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+        geom_point() + 
+        geom_smooth()
+```
+
+NB: Mappings placed instead geom functions are considered local. Can overide global.
+```{r}
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+        geom_point(mapping = aes(color = class)) + 
+        geom_smooth()
+```
+
+You can use the same to specify individual datasets for each layer
+```{r}
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
+        geom_point() +
+        geom_smooth(data = subset(mpg, cyl == 8))
+```
