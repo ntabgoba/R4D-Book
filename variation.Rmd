@@ -121,13 +121,7 @@ ggplot(data = diamonds) +
         - `geom_bin2d()` divides the coordinate plane into a two dimensional grid and then displays the number of observations that fall into each bin in the grid.
         - `geom_hex()` works similarly to geom_bin2d(), but it divides the coordinate plane into hexagon shaped bins.
 
-###### 5.0.3.1.2 Visualize correlations between three variables
 
-There are two ways to add three (or more) variables to a two dimensional plot. You can map additional variables to aesthetics within the plot, or you can use a geom that is designed to visualize three variables.
-
-ggplot2 provides three geoms that are designed to display three variables: `geom_raster(),` `geom_tile() and geom_contour()`. These geoms generalize `geom_bin2d() and geom_density()` to display a third variable instead of a count, or a density.
-
-geom_raster() and geom_tile()
 
 
 
